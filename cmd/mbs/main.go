@@ -22,6 +22,9 @@ var (
 func main() {
 	flag.Parse()
 	s, errChan := bedrock.RunServer(*path, flag.Args()...)
+	// Hook up the local terminal, discarding the output since we already
+	// have server command logging on the stdout.
+	go s.Attach(os.Stdin, ioutil.Discard)
 
 	http.HandleFunc("/raw", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

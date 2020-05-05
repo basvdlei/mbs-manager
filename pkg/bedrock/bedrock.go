@@ -2,8 +2,11 @@
 package bedrock
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"os/exec"
 	"regexp"
 	"sync"
@@ -49,13 +52,13 @@ func RunServer(command string, arg ...string) (*Server, <-chan error) {
 // Currently only prints the messages to the console.
 func (s *Server) processMessages(messages <-chan string) {
 	for m := range messages {
-		fmt.Printf("[MBS<-]: %s\n", m)
+		log.Printf("[MBS<-]: %s\n", m)
 	}
 }
 
 // SendRawCommand sends the given string directly to the server console.
 func (s *Server) SendRawCommand(rawCommand string) {
-	fmt.Printf("[MBS->]: %s\n", rawCommand)
+	log.Printf("[MBS->]: %s\n", rawCommand)
 	s.console.SendRawCommand(rawCommand)
 }
 
@@ -71,6 +74,7 @@ func (s *Server) SendRawCommandWaitResponse(
 	}
 
 	messages := make(chan string)
+	defer close(messages)
 	s.console.Subscribe(messages)
 	defer s.console.Unsubscribe(messages)
 	s.console.SendRawCommand(rawCommand)
@@ -90,6 +94,25 @@ func (s *Server) SendRawCommandWaitResponse(
 			}
 		}
 	}
+}
+
+func (s *Server) Attach(in io.Reader, out io.Writer) error {
+	messages := make(chan string)
+	s.console.Subscribe(messages)
+	defer s.console.Unsubscribe(messages)
+	go func() {
+		for m := range messages {
+			fmt.Fprintln(out, m)
+		}
+	}()
+	scanner := bufio.NewScanner(in)
+	for scanner.Scan() {
+		s.SendRawCommand(scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Stop the server gracefully.
