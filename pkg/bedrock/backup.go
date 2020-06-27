@@ -45,7 +45,9 @@ type TarBackup struct {
 func (t TarBackup) Backup(files []File) error {
 	tw := tar.NewWriter(t.Writer)
 	for _, file := range files {
-		addFileToTar(tw, file)
+		if err := addFileToTar(tw, file); err != nil {
+			return err
+		}
 	}
 	if err := tw.Close(); err != nil {
 		return err
@@ -135,8 +137,9 @@ func copyFile(file File, dest string) error {
 	return nil
 }
 
-// realFilePath returns the real location of the path since most files in the
-// results are located under a seperate `db` directory.
+// realFilePath returns the real location of the path since older versions of
+// the bedrock server (< 1.16) returned the wrong path for most files in the
+// results, since they were located under a seperate `db` directory.
 func realFilePath(file File) string {
 	base := filepath.Base(file.Name)
 	dir := filepath.Dir(file.Name)
