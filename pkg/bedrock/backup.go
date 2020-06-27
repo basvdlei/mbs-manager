@@ -13,13 +13,6 @@ import (
 	"time"
 )
 
-// nonDbFiles are the files of a world that are not in the `db` directory.
-var nonDBFiles = []string{
-	"level.dat",
-	"level.dat_old",
-	"levelname.txt",
-}
-
 type Backupper interface {
 	Backup(files []File) error
 }
@@ -137,20 +130,16 @@ func copyFile(file File, dest string) error {
 	return nil
 }
 
-// realFilePath returns the real location of the path since older versions of
-// the bedrock server (< 1.16) returned the wrong path for most files in the
-// results, since they were located under a seperate `db` directory.
+// realFilePath returns the real relative location of the path.
+// Older older versions of the bedrock server (< 1.16) returned the wrong path
+// for most files in the results, since they were located under a seperate `db`
+// directory.
 func realFilePath(file File) string {
 	base := filepath.Base(file.Name)
 	dir := filepath.Dir(file.Name)
-	var nonDBFile bool
-	for _, f := range nonDBFiles {
-		if base == f {
-			nonDBFile = true
-			break
-		}
-	}
-	if !nonDBFile {
+	// If the given file does not exist assume it's missing the 'db'
+	// subdirectory.
+	if _, err := os.Stat(filepath.Join("worlds", file.Name)); err != nil {
 		dir = filepath.Join(dir, "db")
 	}
 	return filepath.Join(dir, base)
