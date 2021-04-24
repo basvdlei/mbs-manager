@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends unzip
 ADD https://minecraft.azureedge.net/bin-linux/bedrock-server-${version}.zip \
     /bedrock-server/server.zip
 WORKDIR /bedrock-server
-RUN unzip server.zip && rm server.zip
+RUN unzip server.zip && rm server.zip && chmod 0755 bedrock_server
 
 FROM debian:buster-slim AS bedrock-server
 RUN apt-get update && \
