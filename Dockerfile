@@ -24,7 +24,7 @@ COPY --from=unpacker /bedrock-server /usr/local/bedrock-server
 WORKDIR /usr/local/bedrock-server
 ENTRYPOINT [ "/usr/local/bedrock-server/bedrock_server" ]
 
-FROM docker.io/library/golang:1.14-alpine AS builder
+FROM docker.io/library/golang:1.20-alpine AS builder
 COPY . /mbs-manager
 WORKDIR /mbs-manager
 RUN CGO_ENABLED=0 go build ./cmd/mbs/
