@@ -1,5 +1,5 @@
 FROM debian:bullseye-slim AS unpacker
-ARG version=1.16.0.2
+ARG version=1.19.73.02
 ARG license=notaccepted
 RUN if [ "${license}" != "accept" ]; then \
     echo "License not accepted. Please go to" \
