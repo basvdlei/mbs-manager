@@ -1,4 +1,4 @@
-FROM debian:buster-slim AS unpacker
+FROM debian:bullseye-slim AS unpacker
 ARG version=1.16.0.2
 ARG license=notaccepted
 RUN if [ "${license}" != "accept" ]; then \
@@ -14,7 +14,7 @@ ADD https://minecraft.azureedge.net/bin-linux/bedrock-server-${version}.zip \
 WORKDIR /bedrock-server
 RUN unzip server.zip && rm server.zip && chmod 0755 bedrock_server
 
-FROM debian:buster-slim AS bedrock-server
+FROM debian:bullseye-slim AS bedrock-server
 RUN apt-get update && \
     apt-get install -y libcurl4 libssl1.1 && \
     apt-get clean && \
