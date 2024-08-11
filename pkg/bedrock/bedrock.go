@@ -123,7 +123,7 @@ func (s *Server) Stop() {
 func (s *Server) saveHold(ctx context.Context, timeout time.Duration) error {
 	c, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	_, err := s.SendRawCommandWaitResponse(c, "save hold", `(?m)^Saving\.\.\.`)
+	_, err := s.SendRawCommandWaitResponse(c, "save hold", `(?m)Saving\.\.\.`)
 	return err
 }
 
@@ -138,6 +138,6 @@ func (s *Server) saveQuery(ctx context.Context, timeout time.Duration) (string, 
 func (s *Server) saveResume(ctx context.Context, timeout time.Duration) error {
 	c, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	_, err := s.SendRawCommandWaitResponse(c, "save resume", `(?m)^Changes to the world are resumed`)
+	_, err := s.SendRawCommandWaitResponse(c, "save resume", `(?m)Changes to the world are resumed`)
 	return err
 }
