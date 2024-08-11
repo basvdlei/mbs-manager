@@ -185,11 +185,11 @@ func (s *Server) Backup(ctx context.Context, opts BackupOptions) error {
 	// Always try to resume the server in case of an error. When the server
 	// continues to be in a hold state future backups will fail and it will
 	// also hang in case the stop command is given.
-	defer func() {
-		if err != nil {
-			s.saveResume(ctx, time.Duration(5)*time.Second)
-		}
-	}()
+	//defer func() {
+	//	if err != nil {
+	//		s.saveResume(ctx, time.Duration(5)*time.Second)
+	//	}
+	//}()
 
 	err = s.saveHold(ctx, opts.CommandTimeout)
 	if err != nil {
@@ -208,7 +208,11 @@ func (s *Server) Backup(ctx context.Context, opts BackupOptions) error {
 		if err == nil {
 			break
 		}
-		time.Sleep(opts.SavePause)
+		select {
+		case <-time.After(opts.SavePause):
+		case <-ctx.Done():
+			return ctx.Err()
+		}
 	}
 	if err != nil {
 		return err
