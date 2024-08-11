@@ -187,7 +187,7 @@ func (s *Server) Backup(ctx context.Context, opts BackupOptions) error {
 	// also hang in case the stop command is given.
 	defer func() {
 		if err != nil {
-			s.saveResume(ctx, time.Duration(5)*time.Second)
+			s.saveResume(ctx, time.Duration(5)*time.Minute)
 		}
 	}()
 
