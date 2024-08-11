@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -179,7 +180,6 @@ func (s *Server) Backup(ctx context.Context, opts BackupOptions) error {
 		return err
 	}
 
-	// Hold
 	s.backupMutex.Lock()
 	defer s.backupMutex.Unlock()
 	// Always try to resume the server in case of an error. When the server
@@ -191,6 +191,8 @@ func (s *Server) Backup(ctx context.Context, opts BackupOptions) error {
 	//	}
 	//}()
 
+	log.Println("Setting Hold")
+	// Hold
 	err = s.saveHold(ctx, opts.CommandTimeout)
 	if err != nil {
 		return err
@@ -204,6 +206,7 @@ func (s *Server) Backup(ctx context.Context, opts BackupOptions) error {
 	// Query
 	var output string
 	for retry := 3; retry > 0; retry-- {
+		log.Printf("Execute Query, remainting retries %d\n", retry)
 		output, err = s.saveQuery(ctx, opts.CommandTimeout)
 		if err == nil {
 			break
@@ -218,17 +221,20 @@ func (s *Server) Backup(ctx context.Context, opts BackupOptions) error {
 		return err
 	}
 
+	log.Println("Parse Save Query")
 	// Backup
 	files, err := parseSaveQuery(output)
 	if err != nil {
 		return err
 	}
+	log.Println("Backup files")
 	err = opts.Backupper.Backup(files)
 	if err != nil {
 		return err
 	}
 
 	// Resume
+	log.Println("Resume")
 	err = s.saveResume(ctx, opts.CommandTimeout)
 	if err != nil {
 		return err
