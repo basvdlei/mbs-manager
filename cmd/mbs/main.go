@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -24,7 +24,7 @@ func main() {
 	s, errChan := bedrock.RunServer(*path, flag.Args()...)
 	// Hook up the local terminal, discarding the output since we already
 	// have server command logging on the stdout.
-	go s.Attach(os.Stdin, ioutil.Discard)
+	go s.Attach(os.Stdin, io.Discard)
 
 	http.HandleFunc("/raw", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -32,7 +32,7 @@ func main() {
 			return
 		}
 		// XXX: dangerous code, there is NO validation at all.
-		command, err := ioutil.ReadAll(r.Body)
+		command, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

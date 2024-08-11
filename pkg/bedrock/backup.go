@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -85,7 +84,7 @@ func addFileToTar(tw *tar.Writer, file File) error {
 
 // copyBackup writes files into a temp directory.
 func copyBackup(files []File) error {
-	tmpdir, err := ioutil.TempDir("", "backup")
+	tmpdir, err := os.MkdirTemp("", "backup")
 	if err != nil {
 		return err
 	}
