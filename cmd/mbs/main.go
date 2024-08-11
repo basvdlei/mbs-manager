@@ -67,6 +67,8 @@ func main() {
 			Backupper: bedrock.TarBackup{
 				Writer: w,
 			},
+			CommandTimeout: 5 * time.Second,
+			SavePause:      1 * time.Minute,
 		}
 		//err := s.Backup(context.Background(), bedrock.BackupOptions{
 		//	Backupper: bedrock.BackupperFunc(bedrock.CopyBackup),
