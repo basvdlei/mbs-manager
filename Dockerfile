@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim AS unpacker
+FROM debian:bookworm-slim AS unpacker
 ARG version=1.21.3.01
 ARG license=notaccepted
 RUN if [ "${license}" != "accept" ]; then \
