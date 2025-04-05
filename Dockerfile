@@ -1,16 +1,6 @@
 FROM debian:bookworm-slim AS unpacker
-ARG version=1.21.71.01
-ARG license=notaccepted
-RUN if [ "${license}" != "accept" ]; then \
-    echo "License not accepted. Please go to" \
-         "https://www.minecraft.net/en-us/download/server/bedrock/" \
-         "read the documents (like EULA and Privacy policy) that are" \
-         "required to download the Minecraft Bedrock Server." \
-         "After accepting rerun the build with '--build-arg license=accept'." \
-         >&2 ; exit 126 ; fi
 RUN apt-get update && apt-get install -y --no-install-recommends unzip
-ADD https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-${version}.zip \
-    /bedrock-server/server.zip
+COPY server.zip /bedrock-server/server.zip
 WORKDIR /bedrock-server
 RUN unzip server.zip && rm server.zip && chmod 0755 bedrock_server
 
